@@ -3,12 +3,12 @@ import os
 import argparse
 from glob import glob
 
-df = pd.DataFrame( {'Names':["Gavaskar_Kanagaraj","HedayaAli","Lakshmipathi_rao_Devalla","success_abhulimen","Umut_Aktaş"], 'ID':['00','01','02','03','04']} )
 
 parser = argparse.ArgumentParser(description="NBGRADER partner script")
 parser.add_argument('--students', metavar = 's', type = str, required = False)
 parser.add_argument('--assignment', metavar = 'a', type = str, required = False)
 parser.add_argument('--collect', metavar = 'c', type = str, required = False)
+parser.add_argument('--validate', metavar = 'v', type = str, required = False)
 
 args = vars(parser.parse_args())
 
@@ -38,10 +38,18 @@ def create_dirs(df):
     for name in df["Names"]:
         os.system("mkdir "+SUBMISSIONS+name)
 
+def validate_assignment(name):
+
+    try:
+        #os.system("cd ~")
+        os.system("cd ~ \n nbgrader autograde "+ name)
+    except:
+        print("Couldn't find said assignment")
+
 
 def main():
 
-    if args['collect'] == None and args['students'] == None and args['assignment'] == None:
+    if args['collect'] == None and args['students'] == None and args['assignment'] == None and args['validate'] == None :
         print("No arguments \n Ending")
         return
 
@@ -63,6 +71,9 @@ def main():
     
     if args['collect'] != None:
         add_submissions(args['collect'])
+
+    if args['validate'] != None:
+        validate_assignment(args['validate'])
     
 
 
@@ -71,6 +82,7 @@ def main():
 --s + pth to the pkl with the names                   +                     
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
+--v + name of the assignmment to grade                +
                                                       +
 ******************************************************
 '''
