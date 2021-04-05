@@ -2,6 +2,8 @@ import pandas as pd
 import os
 import argparse
 from glob import glob
+import pandas as pd
+import sqlite3 as sql
 
 
 parser = argparse.ArgumentParser(description="NBGRADER partner script")
@@ -9,6 +11,7 @@ parser.add_argument('--students', metavar = 's', type = str, required = False)
 parser.add_argument('--assignment', metavar = 'a', type = str, required = False)
 parser.add_argument('--collect', metavar = 'c', type = str, required = False)
 parser.add_argument('--validate', metavar = 'v', type = str, required = False)
+parser.add_argument('--grades', metavar = 'g', type = str, required = False)
 
 args = vars(parser.parse_args())
 
@@ -45,14 +48,29 @@ def validate_assignment(name):
         os.system("cd ~ \n nbgrader autograde "+ name)
     except:
         print("Couldn't find said assignment")
-
+        
+        
+def get_grades(student, nb):
+    
+    con = sql.connect("/home/jon/gradebook.db")
+    q1 = "SELECT id FROM assignment where name ='{}'".format(nb)
+    ass_id = pd.read_sql_query( q1 , con).values[0][0]
+    q2 = "Select id from submitted_assignment where student_id = '{}' and assignment_id = '{}'".format(student,ass_id)
+    nb_id = pd.read_sql_query( q2 , con).values[0][0]
+    q3 = "Select id from submitted_notebook where assignment_id = '{}'".format(nb_id)
+    nb_id = pd.read_sql_query( q3 , con).values[0][0]
+    q4 = "Select auto_score from grade where notebook_id = '{}'".format(nb_id)
+    grades = pd.read_sql_query( q4 , con)
+    report = " The tudent:  {} \n Assigment:   {} \n Total marks: {}".format(student,nb,grades['auto_score'].sum())
+    print(report)
 
 def main():
 
+    '''
     if args['collect'] == None and args['students'] == None and args['assignment'] == None and args['validate'] == None :
         print("No arguments \n Ending")
         return
-
+    '''
     if args['students'] != None:
 
         df = pd.read_pickle(args['students'])
@@ -75,6 +93,10 @@ def main():
     if args['validate'] != None:
         validate_assignment(args['validate'])
     
+    if args['grades'] != None:
+        s = args['grades'].split()
+        get_grades(s[0],s[1])
+    
 
 
 '''***************************************************+
@@ -83,7 +105,7 @@ def main():
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
 --v + name of the assignmment to grade                +
---m + name of the assignment                          +
+--g + name of the student and of the assignment       +
                                                       +
 ******************************************************
 '''
