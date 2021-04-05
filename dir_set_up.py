@@ -83,6 +83,7 @@ def main():
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
 --v + name of the assignmment to grade                +
+--m + name of the assignment                          +
                                                       +
 ******************************************************
 '''
