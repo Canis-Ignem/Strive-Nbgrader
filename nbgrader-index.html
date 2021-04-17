@@ -13,8 +13,10 @@
     <body style="background-color:powderblue;">  
 
     Please select an option:<br>  <br>
-    <form method="POST" action="/nbgrader-index.html">
-        <input type="submit" name="create_folders" value="students" >
+    <form method="POST" action="/nbgrader-index.html" enctype="multipart/form-data" >
+        year:     <input type="text" name="year" value="" /><br /><br />
+        names:   <input type="file" name="names" /><br /><br />
+                 <input type="submit" name="create_folders" value="students" >
     </form>
     </body>
 

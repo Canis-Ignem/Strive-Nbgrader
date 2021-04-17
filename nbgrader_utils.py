@@ -23,7 +23,8 @@ SUBMISSIONS = '/home/'+ user + "/submitted/"
 def add_submissions(pth):
 
     for notebook in os.listdir(pth):
-        name = df['Names'][ int( notebook[:2] ) ]
+        df = pd.read_excel("./student_codes.xlsx")
+        name = df['Name'][ int( notebook[:2] ) ]
         os.system("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
         os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:] )
 
@@ -36,10 +37,11 @@ def preprocess_df(df):
 
 def create_dirs(df):
 
-    df = preprocess_df(df)
+    #df = preprocess_df(df)
 
-    for name in df["Names"]:
-        os.system("mkdir "+SUBMISSIONS+name)
+    for name in df["Name"]:
+        print(name)
+        os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
 
 def validate_assignment(name):
 
@@ -73,10 +75,8 @@ def main():
     '''
     if args['students'] != None:
 
-        df = pd.read_pickle(args['students'])
+        df = pd.read_excel(args['students'])
         create_dirs(df)
-        print("Here is a full list of the student folders: \n")
-        os.system("cd "+SUBMISSIONS +"\n ls")
 
     if args['assignment'] != None:
 
@@ -101,7 +101,7 @@ def main():
 
 '''***************************************************+
                                                       +
---s + pth to the pkl with the names                   +                     
+--s + pth to the xlsx with the names                   +                     
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
 --v + name of the assignmment to grade                +
