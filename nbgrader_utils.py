@@ -17,6 +17,7 @@ args = vars(parser.parse_args())
 
 user = os.listdir('/home/')[0]
 SUBMISSIONS = '/home/'+ user + "/submitted/"
+AUTOGRADED = '/home/'+ user + "/autograded/"
 
 
 
@@ -25,8 +26,10 @@ def add_submissions(pth):
     for notebook in os.listdir(pth):
         df = pd.read_excel("./student_codes.xlsx")
         name = df['Name'][ int( notebook[:2] ) ]
-        os.system("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
-        os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:] )
+        #print("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
+        os.system("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ name + "\"" +"/"+ notebook[2:5])
+        #print(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:])
+        os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  name  +"/"+ notebook[2:5] +"/"+notebook[2:] )
 
 def preprocess_df(df):
 
@@ -41,7 +44,8 @@ def create_dirs(df):
 
     for name in df["Name"]:
         print(name)
-        os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
+        #os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
+        os.system("mkdir "+AUTOGRADED+ "\""+ name + "\"")
 
 def validate_assignment(name):
 
@@ -66,6 +70,14 @@ def get_grades(student, nb):
     report = " The tudent:  {} \n Assigment:   {} \n Total marks: {}".format(student,nb,grades['auto_score'].sum())
     print(report)
 
+
+def create_assignment(assig):
+
+    for student in os.listdir(SUBMISSIONS):
+            pth = SUBMISSIONS+ "\""+ student + "\"" + "/" + assig
+            pth2 = AUTOGRADED+ "\""+ student + "\"" + "/" + assig
+            os.system("mkdir "+pth)
+            os.system("mkdir "+pth2)
 def main():
 
     '''
@@ -81,11 +93,8 @@ def main():
     if args['assignment'] != None:
 
         assingment = args['assignment']
-
-        for student in os.listdir(SUBMISSIONS):
-            pth = os.path.join(SUBMISSIONS,student)
-            pth = os.path.join(pth,assingment)
-            os.system("mkdir "+pth)
+        create_assignment(assingment)
+        
     
     if args['collect'] != None:
         add_submissions(args['collect'])
@@ -94,7 +103,7 @@ def main():
         validate_assignment(args['validate'])
     
     if args['grades'] != None:
-        s = args['grades'].split()
+        s = args['grades'].split(",")
         get_grades(s[0],s[1])
     
 
