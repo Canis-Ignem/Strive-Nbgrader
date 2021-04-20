@@ -44,7 +44,7 @@ def create_dirs(df):
 
     for name in df["Name"]:
         print(name)
-        #os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
+        os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
         os.system("mkdir "+AUTOGRADED+ "\""+ name + "\"")
 
 def validate_assignment(name):
@@ -58,18 +58,32 @@ def validate_assignment(name):
         
 def get_grades(student, nb):
     
-    con = sql.connect("/home/jon/gradebook.db")
-    q1 = "SELECT id FROM assignment where name ='{}'".format(nb)
-    ass_id = pd.read_sql_query( q1 , con).values[0][0]
-    q2 = "Select id from submitted_assignment where student_id = '{}' and assignment_id = '{}'".format(student,ass_id)
-    nb_id = pd.read_sql_query( q2 , con).values[0][0]
-    q3 = "Select id from submitted_notebook where assignment_id = '{}'".format(nb_id)
-    nb_id = pd.read_sql_query( q3 , con).values[0][0]
-    q4 = "Select auto_score from grade where notebook_id = '{}'".format(nb_id)
-    grades = pd.read_sql_query( q4 , con)
-    report = " The tudent:  {} \n Assigment:   {} \n Total marks: {}".format(student,nb,grades['auto_score'].sum())
-    print(report)
-
+    try:
+        con = sql.connect("/home/jon/gradebook.db")
+        q1 = "SELECT id FROM assignment where name ='{}'".format(nb)
+        ass_id = pd.read_sql_query( q1 , con).values[0][0]
+        
+        q2 = "Select id from submitted_assignment where student_id = '{}' and assignment_id = '{}'".format(student,ass_id)
+        nb_id = pd.read_sql_query( q2 , con).values[0][0]
+        
+        q3 = "Select id from submitted_notebook where assignment_id = '{}'".format(nb_id)
+        nb_id = pd.read_sql_query( q3 , con).values[0][0]
+        
+        q4 = "Select auto_score,cell_id from grade where notebook_id = '{}'".format(nb_id)
+        grades = pd.read_sql_query( q4 , con)
+        
+        cell_list = grades['cell_id'].values.tolist()
+        as_str = ','.join("\'"+str(cell_list[i])+ "\'"  for i in range(len(cell_list)))
+        q5 = "Select max_score from grade_cells where id IN ({})".format( as_str )
+        max_score = pd.read_sql_query( q5 , con)
+        
+       
+        report = " The student:  {} \n Assigment:   {} \n Total marks: {}/{}".format(student,nb,grades['auto_score'].sum(),max_score['max_score'].sum())
+        #print(report)
+        return report
+    except:
+        #print("No submission for that student")
+        return "No submission for this student"
 
 def create_assignment(assig):
 
@@ -104,7 +118,8 @@ def main():
     
     if args['grades'] != None:
         s = args['grades'].split(",")
-        get_grades(s[0],s[1])
+        res = get_grades(s[0],s[1])
+        print(res)
     
 
 
