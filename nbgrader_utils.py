@@ -26,10 +26,11 @@ def add_submissions(pth):
     for notebook in os.listdir(pth):
         df = pd.read_excel("./student_codes.xlsx")
         name = df['Name'][ int( notebook[:2] ) ]
+        print(name,notebook)
         #print("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
-        os.system("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ name + "\"" +"/"+ notebook[2:5])
+        os.system("cp "+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ str(name) + "\"" +"/"+ notebook[2:5])
         #print(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:])
-        os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  name  +"/"+ notebook[2:5] +"/"+notebook[2:] )
+        os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  str(name)  +"/"+ notebook[2:5] +"/"+notebook[2:] )
 
 def preprocess_df(df):
 
@@ -37,6 +38,15 @@ def preprocess_df(df):
         df["Names"][i] = df["Names"][i].replace(" ","_")
     return df
 
+def deliver_extra_files(pth,ex):
+    
+    df = pd.read_excel("./student_codes.xlsx")
+    for i in range(df['Name'].shape[0]):
+
+        print("cp -r "+ pth + " "+ SUBMISSIONS + "\""+ df['Name'][i]+ "\"" +"/"+ ex)
+        os.system("cp -r "+ pth + " "+ SUBMISSIONS + "\""+ df['Name'][i] + "\"" +"/"+ ex)
+
+#deliver_extra_files("/home/jon/Desktop/datasets", "ml3")
 
 def create_dirs(df):
 
@@ -89,9 +99,8 @@ def create_assignment(assig):
 
     for student in os.listdir(SUBMISSIONS):
             pth = SUBMISSIONS+ "\""+ student + "\"" + "/" + assig
-            pth2 = AUTOGRADED+ "\""+ student + "\"" + "/" + assig
             os.system("mkdir "+pth)
-            os.system("mkdir "+pth2)
+
 def main():
 
     '''

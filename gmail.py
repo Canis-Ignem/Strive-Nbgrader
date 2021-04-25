@@ -1,38 +1,44 @@
 import smtplib
 from nbgrader_utils import get_grades
 import pandas as pd
-
+import numpy as np
 sender_email = "jonperezetxebarria@gmail.com"
 
-data = pd.read_excel("./student_codes.xlsx")
+
+
 
 def send_emails(assig):
+    
+    data = pd.read_excel("./student_codes.xlsx")
+    data = data.dropna(axis='rows')
 
     for i in range(data.shape[0]):
-        subject = "Grade "+assig
         
-        receiver_email = data['EMAIL'][i]
-        body = get_grades(data['Name'][i], assig)
-        #print(receiver_email)
-        #print(mess)
-
-        pas= ""
-        with open("./pass",'r') as f:
-            pas = f.readline()
-
-        message = f'Subject: {subject}\n\n{body}'
-
-
-        try:
-            s = smtplib.SMTP('smtp.gmail.com', 587)
-            s.ehlo()
-            s.starttls()
-            s.login(sender_email, pas)
-            s.sendmail(sender_email, receiver_email, message)         
-            print( "Successfully sent email")
-            s.quit()
-        except Exception as vx:
+            subject = "Grade "+assig
+            print(data.values[i][0])
             
-            print(vx)
-        
-send_emails("ml1")
+            body = get_grades(data.values[i][0], assig)
+            receiver_email = data.values[i][3]
+            #print(receiver_email)
+            #print(mess)
+
+            pas= ""
+            with open("./pass",'r') as f:
+                pas = f.readline()
+
+            message = f'Subject: {subject}\n\n{body}'
+            #print(message)
+            
+            try:
+                s = smtplib.SMTP('smtp.gmail.com', 587)
+                s.ehlo()
+                s.starttls()
+                s.login(sender_email, pas)
+                s.sendmail(sender_email, receiver_email, message)         
+                print( "Successfully sent email to: ", receiver_email)
+                s.quit()
+            except Exception as vx:
+                
+                print(vx)
+            
+send_emails("ml3")
