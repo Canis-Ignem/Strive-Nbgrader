@@ -29,6 +29,7 @@ def send_emails(assig):
             message = f'Subject: {subject}\n\n{body}'
             #print(message)
             
+            
             try:
                 s = smtplib.SMTP('smtp.gmail.com', 587)
                 s.ehlo()
@@ -41,4 +42,4 @@ def send_emails(assig):
                 
                 print(vx)
             
-send_emails("ml3")
+send_emails("ml4")

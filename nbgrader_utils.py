@@ -5,13 +5,14 @@ from glob import glob
 import pandas as pd
 import sqlite3 as sql
 
-
+#/home/jon/Documents/Strive/nbgrader_submissions/ml4
 parser = argparse.ArgumentParser(description="NBGRADER partner script")
 parser.add_argument('--students', metavar = 's', type = str, required = False)
 parser.add_argument('--assignment', metavar = 'a', type = str, required = False)
 parser.add_argument('--collect', metavar = 'c', type = str, required = False)
 parser.add_argument('--validate', metavar = 'v', type = str, required = False)
 parser.add_argument('--grades', metavar = 'g', type = str, required = False)
+parser.add_argument('--deliver', metavar = 'd', type = str, required = False)
 
 args = vars(parser.parse_args())
 
@@ -23,12 +24,12 @@ AUTOGRADED = '/home/'+ user + "/autograded/"
 
 def add_submissions(pth):
 
-    for notebook in os.listdir(pth):
+    for notebook in os.listdir("/home/jon/Documents/Strive/nbgrader_submissions/"+ pth):
         df = pd.read_excel("./student_codes.xlsx")
         name = df['Name'][ int( notebook[:2] ) ]
         print(name,notebook)
         #print("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
-        os.system("cp "+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ str(name) + "\"" +"/"+ notebook[2:5])
+        os.system("cp "+ "/home/jon/Documents/Strive/nbgrader_submissions/"+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ str(name) + "\"" +"/"+ notebook[2:5])
         #print(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:])
         os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  str(name)  +"/"+ notebook[2:5] +"/"+notebook[2:] )
 
@@ -43,10 +44,8 @@ def deliver_extra_files(pth,ex):
     df = pd.read_excel("./student_codes.xlsx")
     for i in range(df['Name'].shape[0]):
 
-        print("cp -r "+ pth + " "+ SUBMISSIONS + "\""+ df['Name'][i]+ "\"" +"/"+ ex)
-        os.system("cp -r "+ pth + " "+ SUBMISSIONS + "\""+ df['Name'][i] + "\"" +"/"+ ex)
-
-#deliver_extra_files("/home/jon/Desktop/datasets", "ml3")
+        print("cp -r "+ "\"" + pth + "\"" + " "+ SUBMISSIONS + "\""+ str(df['Name'][i])+ "\"" +"/"+ ex)
+        os.system("cp -r " + "\"" + pth + "\"" + " "+ SUBMISSIONS + "\""+ str(df['Name'][i]) + "\"" +"/"+ ex)
 
 def create_dirs(df):
 
@@ -129,7 +128,10 @@ def main():
         s = args['grades'].split(",")
         res = get_grades(s[0],s[1])
         print(res)
-    
+    if args['deliver'] != None:
+        s = args['deliver'].split(",")
+        deliver_extra_files(s[0],s[1])
+        
 
 
 '''***************************************************+
@@ -139,6 +141,7 @@ def main():
 --c + pth to where the students notebooks are stored  +
 --v + name of the assignmment to grade                +
 --g + name of the student and of the assignment       +
+--d + path  to file and exercise separated by ','     +
                                                       +
 ******************************************************
 '''
