@@ -16,22 +16,25 @@ parser.add_argument('--deliver', metavar = 'd', type = str, required = False)
 
 args = vars(parser.parse_args())
 
+'''
 user = os.listdir('/home/')[0]
 SUBMISSIONS = '/home/'+ user + "/submitted/"
 AUTOGRADED = '/home/'+ user + "/autograded/"
-
-
+'''
+SUBMISSIONS = "~/submitted/"
 
 def add_submissions(pth):
-
+    df = pd.read_excel("./student_codes.xlsx")
+    abs_path = "/home/jon/Documents/Strive/nbgrader_submissions/"+ pth
     for notebook in os.listdir("/home/jon/Documents/Strive/nbgrader_submissions/"+ pth):
-        df = pd.read_excel("./student_codes.xlsx")
-        name = df['Name'][ int( notebook[:2] ) ]
-        print(name,notebook)
-        #print("mv "+ pth +"/"+ notebook +" "+ SUBMISSIONS + name +"/"+ notebook[2:5])
-        os.system("cp "+ "/home/jon/Documents/Strive/nbgrader_submissions/"+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ str(name) + "\"" +"/"+ notebook[2:5])
-        #print(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:])
-        os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  str(name)  +"/"+ notebook[2:5] +"/"+notebook[2:] )
+        if notebook.lower() == "readme.md":
+            continue
+        else:
+            name = df['Name'][ int( notebook[:2] ) ]
+            print(name,notebook)
+            os.system("cp "+ "/home/jon/Documents/Strive/nbgrader_submissions/"+ pth +"/"+ notebook +" "+ SUBMISSIONS + "\""+ str(name) + "\"" +"/"+ notebook[2:5])
+            #print(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook[2:])
+            os.rename(SUBMISSIONS + name +"/"+ notebook[2:5] +"/"+notebook , SUBMISSIONS +  str(name)  +"/"+ notebook[2:5] +"/"+notebook[2:] )
 
 def preprocess_df(df):
 
@@ -136,10 +139,10 @@ def main():
 
 '''***************************************************+
                                                       +
---s + pth to the xlsx with the names                   +                     
+--s + pth to the xlsx with the names                  +                     
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
---v + name of the assignmment to grade                +
+-- + name of the assignmment to grade                +
 --g + name of the student and of the assignment       +
 --d + path  to file and exercise separated by ','     +
                                                       +

@@ -14,7 +14,7 @@ def send_emails(assig):
 
     for i in range(data.shape[0]):
         
-            subject = "Grade "+assig
+            subject = "(Optional) Grade "+assig
             print(data.values[i][0])
             
             body = get_grades(data.values[i][0], assig)
@@ -42,4 +42,4 @@ def send_emails(assig):
                 
                 print(vx)
             
-send_emails("ml4")
+send_emails("ml8")
