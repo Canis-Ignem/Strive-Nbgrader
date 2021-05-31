@@ -5,6 +5,12 @@ from glob import glob
 import pandas as pd
 import sqlite3 as sql
 
+
+
+BATCHES = ["Mar21","May21"]
+
+
+
 #/home/jon/Documents/Strive/nbgrader_submissions/ml4
 parser = argparse.ArgumentParser(description="NBGRADER partner script")
 parser.add_argument('--students', metavar = 's', type = str, required = False)
@@ -16,12 +22,20 @@ parser.add_argument('--deliver', metavar = 'd', type = str, required = False)
 
 args = vars(parser.parse_args())
 
-'''
+SUBMISSIONS = ""
+AUTOGRADED = ""
+
+batch = input("Please select a batch: {} ".format(BATCHES) )
+print(batch)
+for b in BATCHES:
+    if b == batch:
+        user = os.listdir('/home/')[0]
+        SUBMISSIONS = '/home/'+ user +"/"+ b + "/submitted/"
+        AUTOGRADED = '/home/'+ user + "/"+ b + "/autograded/"
+        print(SUBMISSIONS)
+
 user = os.listdir('/home/')[0]
-SUBMISSIONS = '/home/'+ user + "/submitted/"
-AUTOGRADED = '/home/'+ user + "/autograded/"
-'''
-SUBMISSIONS = "~/submitted/"
+#SUBMISSIONS = "~/submitted/"
 
 def add_submissions(pth):
     df = pd.read_excel("./student_codes.xlsx")
@@ -54,16 +68,17 @@ def create_dirs(df):
 
     #df = preprocess_df(df)
 
-    for name in df["Name"]:
-        print(name)
-        os.system("mkdir "+SUBMISSIONS+ "\""+ name + "\"")
-        os.system("mkdir "+AUTOGRADED+ "\""+ name + "\"")
+    for email in df["Email"]:
+        print(email)
+        #print("mkdir "+SUBMISSIONS+ "\""+ email + "\"")
+        os.system("mkdir "+SUBMISSIONS+ "\""+ email + "\"")
+        os.system("mkdir "+AUTOGRADED+ "\""+ email + "\"")
 
 def validate_assignment(name):
 
     try:
         #os.system("cd ~")
-        os.system("cd ~ \n nbgrader autograde "+ name)
+        os.system("cd ~ \n nbgrader autograde --force "+ name)
     except:
         print("Couldn't find said assignment")
         
@@ -72,23 +87,23 @@ def get_grades(student, nb):
     
     try:
         con = sql.connect("/home/jon/gradebook.db")
+        
         q1 = "SELECT id FROM assignment where name ='{}'".format(nb)
         ass_id = pd.read_sql_query( q1 , con).values[0][0]
-        
         q2 = "Select id from submitted_assignment where student_id = '{}' and assignment_id = '{}'".format(student,ass_id)
         nb_id = pd.read_sql_query( q2 , con).values[0][0]
-        
+
         q3 = "Select id from submitted_notebook where assignment_id = '{}'".format(nb_id)
         nb_id = pd.read_sql_query( q3 , con).values[0][0]
-        
+
         q4 = "Select auto_score,cell_id from grade where notebook_id = '{}'".format(nb_id)
         grades = pd.read_sql_query( q4 , con)
-        
+
         cell_list = grades['cell_id'].values.tolist()
         as_str = ','.join("\'"+str(cell_list[i])+ "\'"  for i in range(len(cell_list)))
         q5 = "Select max_score from grade_cells where id IN ({})".format( as_str )
         max_score = pd.read_sql_query( q5 , con)
-        
+        #print(max_score['max_score'].sum())
        
         report = " The student:  {} \n Assigment:   {} \n Total marks: {}/{}".format(student,nb,grades['auto_score'].sum(),max_score['max_score'].sum())
         #print(report)
@@ -102,6 +117,7 @@ def create_assignment(assig):
     for student in os.listdir(SUBMISSIONS):
             pth = SUBMISSIONS+ "\""+ student + "\"" + "/" + assig
             os.system("mkdir "+pth)
+            #print("mkdir "+pth)
 
 def main():
 
@@ -110,6 +126,7 @@ def main():
         print("No arguments \n Ending")
         return
     '''
+
     if args['students'] != None:
 
         df = pd.read_excel(args['students'])
@@ -142,7 +159,7 @@ def main():
 --s + pth to the xlsx with the names                  +                     
 --a + name of the assignment to add                   +
 --c + pth to where the students notebooks are stored  +
--- + name of the assignmment to grade                +
+--v + name of the assignmment to grade                +
 --g + name of the student and of the assignment       +
 --d + path  to file and exercise separated by ','     +
                                                       +
